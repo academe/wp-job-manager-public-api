@@ -51,7 +51,11 @@ Nothing special, just the usual installation steps.
 
 == Changelog ==
 
-= 1.0.0: June 30, 2017 =
+= 1.0.1: 2017-07-04 =
+
+* Include expired jobs in selection.
+
+= 1.0.0: 2017-06-30 =
 
 * Initial release.
 
