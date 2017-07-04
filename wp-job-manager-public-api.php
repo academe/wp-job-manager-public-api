@@ -3,7 +3,7 @@
  * Plugin Name: WP Job Manager - Public API
  * Plugin URI: http://www.academe.co.uk/
  * Description: WP Plugin to expose non-sensitive WP Job Manager job details through the WP REST API.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Academe Computing
  * Author URI: http://www.academe.co.uk/
  * Text Domain: wp-job-manager-public-api
@@ -22,24 +22,26 @@ if (! defined('ABSPATH')) {
 add_action('rest_api_init', function () {
     $api_route = 'wpjm_public/v1';
 
-    $post_status = 'publish';
+    // Include expired jobs, because they *were* most likely public once.
+    $post_statuses = ['publish', 'expired'];
     $post_type = 'job_listing';
 
     register_rest_route($api_route, '/job/(?P<id>\d+)',[
         'methods' => 'GET',
-        'callback' => function(WP_REST_Request $request) use ($post_status, $post_type) {
+        'callback' => function(WP_REST_Request $request) use ($post_statuses, $post_type) {
             // The ID of the job we want.
             $post_id = $request->get_param('id');
 
             // Get the job.
             $post = get_post($post_id);
 
-            // Return the post details.
-            if ($post->post_type == $post_type && $post->post_status == $post_status) {
+            // Return the post details if the post type and status is acceptable.
+            if ($post->post_type == $post_type && in_array($post->post_status, $post_statuses)) {
                 return [
                     $post->ID => [
                         'post_title' => $post->post_title,
                         'post_name' => $post->post_name,
+                        'post_type' => $post->post_type,
                         'permalink' => get_permalink($post),
                         'post_date_gmt' => $post->post_date_gmt,
                         'post_status' => $post->post_status,
@@ -47,6 +49,7 @@ add_action('rest_api_init', function () {
                     ]
                 ];
             }
+
             // No post or the wrong type of post.
             return new WP_Error('invalid_job', 'Invalid job', ['status' => 404]);
         },
@@ -58,7 +61,7 @@ add_action('rest_api_init', function () {
     /**
      * The callback function, used over several similar routes.
      */
-    $callback = function(WP_REST_Request $request) use ($post_status, $post_type) {
+    $callback = function(WP_REST_Request $request) use ($post_statuses, $post_type) {
         // Just an assumption this will be okay for now.
         $posts_per_page = 1000;
 
@@ -68,7 +71,7 @@ add_action('rest_api_init', function () {
         $before = str_replace('_', ' ', $request->get_param('date_to', ''));
 
         $args = [
-            'post_status' => $post_status,
+            'post_status' => $post_statuses,
             'post_type' => $post_type,
             'posts_per_page' => $posts_per_page,
         ];
@@ -95,6 +98,7 @@ add_action('rest_api_init', function () {
             $data[$post->ID] = [
                 'post_title' => $post->post_title,
                 'post_name' => $post->post_name,
+                'post_type' => $post->post_type,
                 'permalink' => get_permalink($post),
                 'post_date_gmt' => $post->post_date_gmt,
                 'post_status' => $post->post_status,
