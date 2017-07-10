@@ -3,7 +3,7 @@
  * Plugin Name: WP Job Manager - Public API
  * Plugin URI: http://www.academe.co.uk/
  * Description: WP Plugin to expose non-sensitive WP Job Manager job details through the WP REST API.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Academe Computing
  * Author URI: http://www.academe.co.uk/
  * Text Domain: wp-job-manager-public-api
@@ -26,9 +26,23 @@ add_action('rest_api_init', function () {
     $post_statuses = ['publish', 'expired'];
     $post_type = 'job_listing';
 
+    $format_post = function($post) {
+        return [
+            'post_title' => $post->post_title,
+            'post_name' => $post->post_name,
+            'post_type' => $post->post_type,
+            'permalink' => get_permalink($post),
+            'post_date_gmt' => $post->post_date_gmt,
+            'post_status' => $post->post_status,
+            'guid' => $post->guid,
+            'application_deadline_date' => get_post_meta($post->ID, '_application_deadline', true),
+            'listing_expiry_date' => get_post_meta($post->ID, '_job_expires', true),
+        ];
+    };
+
     register_rest_route($api_route, '/job/(?P<id>\d+)',[
         'methods' => 'GET',
-        'callback' => function(WP_REST_Request $request) use ($post_statuses, $post_type) {
+        'callback' => function(WP_REST_Request $request) use ($post_statuses, $post_type, $format_post) {
             // The ID of the job we want.
             $post_id = $request->get_param('id');
 
@@ -38,15 +52,7 @@ add_action('rest_api_init', function () {
             // Return the post details if the post type and status is acceptable.
             if ($post->post_type == $post_type && in_array($post->post_status, $post_statuses)) {
                 return [
-                    $post->ID => [
-                        'post_title' => $post->post_title,
-                        'post_name' => $post->post_name,
-                        'post_type' => $post->post_type,
-                        'permalink' => get_permalink($post),
-                        'post_date_gmt' => $post->post_date_gmt,
-                        'post_status' => $post->post_status,
-                        'guid' => $post->guid,
-                    ]
+                    $post->ID => $format_post($post)
                 ];
             }
 
@@ -61,7 +67,7 @@ add_action('rest_api_init', function () {
     /**
      * The callback function, used over several similar routes.
      */
-    $callback = function(WP_REST_Request $request) use ($post_statuses, $post_type) {
+    $callback = function(WP_REST_Request $request) use ($post_statuses, $post_type, $format_post) {
         // Just an assumption this will be okay for now.
         $posts_per_page = 1000;
 
@@ -95,15 +101,7 @@ add_action('rest_api_init', function () {
         $data = [];
 
         foreach($posts as $post) {
-            $data[$post->ID] = [
-                'post_title' => $post->post_title,
-                'post_name' => $post->post_name,
-                'post_type' => $post->post_type,
-                'permalink' => get_permalink($post),
-                'post_date_gmt' => $post->post_date_gmt,
-                'post_status' => $post->post_status,
-                'guid' => $post->guid,
-            ];
+            $data[$post->ID] = $format_post($post);
         }
 
         return $data;
