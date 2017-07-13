@@ -2,7 +2,7 @@
 Contributors: judgej
 Requires at least: 4.4 
 Tested up to: 4.5.*
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GNU General Public License v3.0
 
 Until the WP Job Manager fully supports the WP REST APi, this will expose titles and permalinks to the REST API.
@@ -51,6 +51,10 @@ Raise an issue on the github project, and we will take it from there.
 Nothing special, just the usual installation steps.
 
 == Changelog ==
+
+= 1.1.1: 2017-07-13 =
+
+* Fetching single job no longer wrapped in array (wrong source released in 1.1.0).
 
 = 1.1.0: 2017-07-10 =
 
