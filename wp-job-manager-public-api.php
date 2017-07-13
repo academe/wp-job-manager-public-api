@@ -3,7 +3,7 @@
  * Plugin Name: WP Job Manager - Public API
  * Plugin URI: http://www.academe.co.uk/
  * Description: WP Plugin to expose non-sensitive WP Job Manager job details through the WP REST API.
- * Version: 1.0.2
+ * Version: 1.1.1
  * Author: Academe Computing
  * Author URI: http://www.academe.co.uk/
  * Text Domain: wp-job-manager-public-api
@@ -26,8 +26,10 @@ add_action('rest_api_init', function () {
     $post_statuses = ['publish', 'expired'];
     $post_type = 'job_listing';
 
+    // Construct the data structure to be returned for a post.
     $format_post = function($post) {
         return [
+            'post_id' => $post->ID,
             'post_title' => $post->post_title,
             'post_name' => $post->post_name,
             'post_type' => $post->post_type,
@@ -51,9 +53,7 @@ add_action('rest_api_init', function () {
 
             // Return the post details if the post type and status is acceptable.
             if ($post->post_type == $post_type && in_array($post->post_status, $post_statuses)) {
-                return [
-                    $post->ID => $format_post($post)
-                ];
+                return $format_post($post);
             }
 
             // No post or the wrong type of post.
