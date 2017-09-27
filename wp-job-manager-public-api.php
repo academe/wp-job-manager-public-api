@@ -3,7 +3,7 @@
  * Plugin Name: WP Job Manager - Public API
  * Plugin URI: http://www.academe.co.uk/
  * Description: WP Plugin to expose non-sensitive WP Job Manager job details through the WP REST API.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Academe Computing
  * Author URI: http://www.academe.co.uk/
  * Text Domain: wp-job-manager-public-api
@@ -42,7 +42,7 @@ add_action('rest_api_init', function () {
         ];
     };
 
-    register_rest_route($api_route, '/job/(?P<id>\d+)',[
+    register_rest_route($api_route, '/jobs?/(?P<id>\d+)', [
         'methods' => 'GET',
         'callback' => function(WP_REST_Request $request) use ($post_statuses, $post_type, $format_post) {
             // The ID of the job we want.
@@ -110,7 +110,7 @@ add_action('rest_api_init', function () {
     /**
      * No from or to dates. Defaults to "latest".
      */
-    register_rest_route($api_route, '/jobs',[
+    register_rest_route($api_route, '/jobs?',[
         'methods' => 'GET',
         'callback' => $callback,
     ]);
@@ -118,7 +118,7 @@ add_action('rest_api_init', function () {
     /**
      * From date only.
      */
-    register_rest_route($api_route, '/jobs/(?P<date_from>[-+_a-zA-Z0-9]+)',[
+    register_rest_route($api_route, '/jobs?/(?P<date_from>[-+_a-zA-Z0-9]+)',[
         'methods' => 'GET',
         'callback' => $callback,
         'args' => ['date_from'],
@@ -127,7 +127,7 @@ add_action('rest_api_init', function () {
     /**
      * From and oto dates (date range).
      */
-    register_rest_route($api_route, '/jobs/(?P<date_from>[-+_a-zA-Z0-9]+)/(?P<date_to>[-a-zA-Z0-9]+)',[
+    register_rest_route($api_route, '/jobs?/(?P<date_from>[-+_a-zA-Z0-9]+)/(?P<date_to>[-a-zA-Z0-9]+)',[
         'methods' => 'GET',
         'callback' => $callback,
         'args' => ['date_from', 'date_to'],
