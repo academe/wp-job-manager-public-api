@@ -1,8 +1,8 @@
 === WP Job Manager - Public API ===
 Contributors: judgej
-Requires at least: 4.4 
-Tested up to: 4.5.*
-Stable tag: 1.1.1
+Requires at least: 4.4
+Tested up to: 4.8.2
+Stable tag: 1.1.2
 License: GNU General Public License v3.0
 
 Until the WP Job Manager fully supports the WP REST APi, this will expose titles and permalinks to the REST API.
@@ -10,14 +10,21 @@ Until the WP Job Manager fully supports the WP REST APi, this will expose titles
 = Documentation =
 
 This plugin offers no configuration or administration pages. It just does what it does.
+I expect and hope the need for plugin will be redundant in time, as WP Job Manager starts to
+support these capabilities, i.e. offers guest access to jobs that are accessible as guests
+at the front end.
 
 This plugin requires at least PHP 5.4
 
+Note: from version 1.1.2 for all endpoints, the path part "job" and "jobs" is synonymous; you can use either.
+Version 1.1.1 used a mix of the two, for multiple and single job fetching.
+This change was introduced for consistency, but in a backward-compatible way.
+
 A single job detail can be found at the endpoint:
 
-    https://example.com/wp-json/wpjm_public/v1/job/{job_id}
+    https://example.com/wp-json/wpjm_public/v1/jobs/{job_id}
 
-e.g. https://example.com/wp-json/wpjm_public/v1/job/2567
+e.g. https://example.com/wp-json/wpjm_public/v1/jobs/2567
 
 ```
 "2567": {
@@ -51,6 +58,10 @@ Raise an issue on the github project, and we will take it from there.
 Nothing special, just the usual installation steps.
 
 == Changelog ==
+
+= 1.1.2: 2017-09-27 =
+
+* Make "jobs" and "job" endpoint path partials synonymous.
 
 = 1.1.1: 2017-07-13 =
 
